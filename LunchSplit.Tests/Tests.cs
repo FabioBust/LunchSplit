@@ -83,4 +83,33 @@
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => splitter.ComputeTip(subtotal, mode, tipInput));
         }
     }
+
+    [TestClass]
+    public sealed class RoundingTests
+    {
+        // M2-6 Ensure raw share decimals are preserved without modification
+        public void RoundShares_NoRounding_PreservesRawDecimals()
+        {
+
+        }
+
+        // M2-7 IEEE 754: $10.325 -> $10.32; $10.335 -> $10.34
+        public void RoundShares_BankersRounding_RoundsToNearestEven()
+        {
+
+        }
+
+        // M2-8 Ceil-rounding shifts any fractional cent upwards ($10.331 -> $10.34)
+        public void RoundShares_RoundUp_AppliesCeilingToCents()
+        {
+
+        }
+
+        // M2-9 Floor-rounding truncates fractional cents ($10.339 -> $10.33).
+        public void RoundShares_RoundDown_AppliesFloorToCents()
+        {
+
+        }
+    }
+
 }
