@@ -89,7 +89,7 @@ namespace LunchSplit.Tests
     }
 
     [TestClass]
-    public sealed class RoundingTests
+    public sealed class RounderTests
     {
         // M2-6 Ensure raw share decimals are preserved without modification
         [TestMethod]
@@ -179,6 +179,27 @@ namespace LunchSplit.Tests
         [TestMethod]
         public void RoundShares_UnevenSplit_ReconcilesRemainder()
         {
+            // Arrange
+            Rounder rounder = new Rounder();
+
+            decimal rawAmount = 10.00m / 3;
+
+            List<Share> rawShares = new List<Share>
+        {
+            new Share("Fabio", rawAmount),
+            new Share("Carlos", rawAmount),
+            new Share("Javier", rawAmount)
+        };
+
+            RoundingMode mode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> roundedShares = rounder.RoundShares(rawShares, mode);
+
+            // Assert
+            Assert.AreEqual(3.34m, roundedShares[0].Amount);
+            Assert.AreEqual(3.33m, roundedShares[1].Amount);
+            Assert.AreEqual(3.33m, roundedShares[2].Amount);
 
         }
 
@@ -187,8 +208,20 @@ namespace LunchSplit.Tests
         public void RoundShares_EmptyShareCollection_ReturnsEmpty()
         {
 
-        }
+            // Arrange
+            Rounder rounder = new Rounder();
 
+            List<Share> rawShares = new List<Share>(); // Empty list
+
+            RoundingMode mode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> roundedShares = rounder.RoundShares(rawShares, mode);
+
+            // Assert
+            Assert.AreEqual(0, roundedShares.Count);
+
+        }
     }
 
     [TestClass]
@@ -198,28 +231,101 @@ namespace LunchSplit.Tests
         [TestMethod]
         public void Validate_CompleteBillDetails_ReturnsOk()
         {
+            // Arrange
+            BillValidator validator = new BillValidator();
 
+            decimal subtotal = 10.00m;
+            decimal tax = 1.30m;
+            TipMode mode = TipMode.Fixed;
+            decimal tipInput = 2m;
+
+            Bill bill = new Bill(subtotal,tax, mode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            // Act
+            ValidationResult result = validator.Validate(bill, attendees);
+
+            // Assert
+            Assert.IsTrue(result.IsValid);
         }
 
         // M3-13 Flag zero-attendee collections as invalid with error msg
         [TestMethod]
         public void Validate_EmptyAttendeeCollection_ReturnsFail()
         {
+            // Arrange
+            BillValidator validator = new BillValidator();
 
+            decimal subtotal = 10.00m;
+            decimal tax = 1.30m;
+            TipMode mode = TipMode.Fixed;
+            decimal tipInput = 2m;
+
+            Bill bill = new Bill(subtotal, tax, mode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>();
+
+            // Act
+            ValidationResult result = validator.Validate(bill, attendees);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
         }
 
         // M3-14 Verify negative subtotals fail with student-friendly error
         [TestMethod]
         public void Validate_NegativeSubtotal_ReturnsFail()
         {
+            // Arrange
+            BillValidator validator = new BillValidator();
 
+            decimal subtotal = -10.00m;
+            decimal tax = 1.30m;
+            TipMode mode = TipMode.Fixed;
+            decimal tipInput = 2m;
+
+            Bill bill = new Bill(subtotal, tax, mode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            // Act
+            ValidationResult result = validator.Validate(bill, attendees);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
         }
 
         // M3-15 Ensure negative tax values fail validation
         [TestMethod]
         public void Validate_NegativeTax_ReturnsFail()
         {
+            // Arrange
+            BillValidator validator = new BillValidator();
 
+            decimal subtotal = 10.00m;
+            decimal tax = -1.30m;
+            TipMode mode = TipMode.Fixed;
+            decimal tipInput = 2m;
+
+            Bill bill = new Bill(subtotal, tax, mode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            // Act
+            ValidationResult result = validator.Validate(bill, attendees);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
         }
 
         // M3-16 Assert that having exactly 0 attendees fails validation
