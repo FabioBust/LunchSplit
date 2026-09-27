@@ -8,6 +8,7 @@ namespace LunchSplit
     {
         None,
         Bankers,
-        Ceil
+        Ceil,
+        Floor
     }
 }
