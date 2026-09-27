@@ -10,5 +10,10 @@ namespace LunchSplit
 {
     internal class Splitter
     {
+        decimal tip;
+        ComputeTip(decimal subtotal, TipMode mode, decimal tipInput)
+        {
+
+        }
     }
 }

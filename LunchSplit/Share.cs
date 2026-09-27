@@ -7,7 +7,15 @@ using System.Text;
 
 namespace LunchSplit
 {
-    internal class Share
+    public class Share
     {
+        public string Name { get; }
+        public decimal Amount { get; }
+
+        public Share(string name, decimal amount)
+        {
+            Name = name;
+            Amount = amount;
+        }
     }
 }
