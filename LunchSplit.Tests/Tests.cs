@@ -274,6 +274,7 @@ namespace LunchSplit.Tests
 
             // Assert
             Assert.IsFalse(result.IsValid);
+            Assert.IsFalse(string.IsNullOrEmpty(result.ErrorMessage));
         }
 
         // M3-14 Verify negative subtotals fail with student-friendly error
@@ -332,7 +333,23 @@ namespace LunchSplit.Tests
         [TestMethod]
         public void Validate_ZeroAttendees_ReturnsFail()
         {
+            // Arrange
+            BillValidator validator = new BillValidator();
 
+            decimal subtotal = 10.00m;
+            decimal tax = 1.30m;
+            TipMode mode = TipMode.Fixed;
+            decimal tipInput = 2m;
+
+            Bill bill = new Bill(subtotal, tax, mode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>();
+
+            // Act
+            ValidationResult result = validator.Validate(bill, attendees);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
         }
     }
 
@@ -343,67 +360,283 @@ namespace LunchSplit.Tests
         [TestMethod]
         public void CalculateShares_EqualSplit_ApportionsEvenly()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 90.00m;
+            decimal tax = 0m;
+            TipMode tMode = TipMode.None;
+            decimal tipInput = 0m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 1, true),
+                new Attendee("Fabio", 1, true),
+                new Attendee("Felix", 1, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> shares = splitter.CalculateShares(bill, attendees, rMode);
+
+            // Assert
+            Assert.AreEqual(30.00m, shares[0].Amount);
+            Assert.AreEqual(30.00m, shares[1].Amount);
+            Assert.AreEqual(30.00m, shares[2].Amount);
         }
 
         // M4-18 Split $90.00 with weights 2 and 1, assert $60.00 and $30.00
         [TestMethod]
         public void CalculateShares_ProportionalSplit_ApportionsWeighted()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 90.00m;
+            decimal tax = 0m;
+            TipMode tMode = TipMode.None;
+            decimal tipInput = 0m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 2, true),
+                new Attendee("Fabio", 1, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> shares = splitter.CalculateShares(bill, attendees, rMode);
+
+            // Assert
+            Assert.AreEqual(60.00m, shares[0].Amount);
+            Assert.AreEqual(30.00m, shares[1].Amount);
         }
 
         // M4-19 Assert excluded attendee gets $0.00; total split among active
         [TestMethod]
         public void CalculateShares_ExcludedAttendee_ApportionsZero()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 90.00m;
+            decimal tax = 0m;
+            TipMode tMode = TipMode.None;
+            decimal tipInput = 0m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 1, false),
+                new Attendee("Fabio", 1, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> shares = splitter.CalculateShares(bill, attendees, rMode);
+
+            // Assert
+            Assert.AreEqual(0.00m, shares[0].Amount);
+            Assert.AreEqual(90.00m, shares[1].Amount);
         }
 
         // M4-20 Split $100.00 + $13.00 tax + 15% tip. Grand Total: $128.00
         [TestMethod]
         public void CalculateShares_TaxAndPercentTip_ApportionsTotal()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 100.00m;
+            decimal tax = 13.00m;
+            TipMode tMode = TipMode.Percent;
+            decimal tipInput = 15m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> shares = splitter.CalculateShares(bill, attendees, rMode);
+
+            // Assert
+            Assert.AreEqual(128.00m, shares[0].Amount);
         }
 
         // M4-21 Split $100.00 + $13.00 tax + $20.00 fixed tip. Grand Total: $133.00
         [TestMethod]
         public void CalculateShares_TaxAndFixedTip_ApportionsTotal()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 100.00m;
+            decimal tax = 13.00m;
+            TipMode tMode = TipMode.Fixed;
+            decimal tipInput = 20.00m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act
+            List<Share> shares = splitter.CalculateShares(bill, attendees, rMode);
+
+            // Assert
+            Assert.AreEqual(133.00m, shares[0].Amount);
         }
 
         // M4-22 Attempting calculations when all users are excluded throws exception
         [TestMethod]
         public void CalculateShares_AllAttendeesExcluded_ThrowsException()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 90.00m;
+            decimal tax = 0m;
+            TipMode tMode = TipMode.None;
+            decimal tipInput = 0m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 1, false),
+                new Attendee("Fabio", 1, false),
+                new Attendee("Felix", 1, false)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act and Assert
+            Assert.ThrowsException<InvalidOperationException>(() => splitter.CalculateShares(bill, attendees, rMode));
         }
 
         // M4-23 All weights set to 0 throws division-by-zero prevention exception
         [TestMethod]
         public void CalculateShares_TotalWeightsZero_ThrowsException()
         {
+            // Arrange
+            Splitter splitter = new Splitter();
 
+            decimal subtotal = 90.00m;
+            decimal tax = 0m;
+            TipMode tMode = TipMode.None;
+            decimal tipInput = 0m;
+
+            Bill bill = new Bill(subtotal, tax, tMode, tipInput);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 0, true),
+                new Attendee("Fabio", 0, true),
+                new Attendee("Felix", 0, true)
+            };
+
+            RoundingMode rMode = RoundingMode.Bankers;
+
+            // Act and Assert
+            Assert.ThrowsException<DivideByZeroException>(() => splitter.CalculateShares(bill, attendees, rMode));
         }
     }
 
     [TestClass]
-    public sealed class ReciptFormatterTests
+    public sealed class ReceiptFormatterTests
     {
         // M5-24 Assert formatted receipt contains exact itemized attendee values
         [TestMethod]
         public void Format_DefaultBillReceipt_ContainsLineItems()
         {
+            // Arrange
+            ReceiptFormatter formatter = new ReceiptFormatter();
 
+            Bill bill = new Bill(50.00m, 0m, TipMode.None, 0m);
+
+            List<Attendee> attendees = new List<Attendee>
+            {
+                new Attendee("Mario", 1, true),
+                new Attendee("Fabio", 1, true)
+            };
+
+            List<Share> shares = new List<Share>
+            {
+                new Share("Mario", 20.00m),
+                new Share("Fabio", 30.00m)
+            };
+
+            // Act
+            string receipt = formatter.Format(bill, attendees, shares);
+
+            // Assert
+            StringAssert.Contains(receipt, "Mario");
+            StringAssert.Contains(receipt, "20.00");
+
+            StringAssert.Contains(receipt, "Fabio");
+            StringAssert.Contains(receipt, "30.00");
         }
 
         // M5-25 Confirm output has Student Name, Date, and creation timestamp
         [TestMethod]
         public void Format_ReceiptOutput_ContainsRequiredMetadata()
         {
+            // Arrange
+            ReceiptFormatter formatter = new ReceiptFormatter();
 
+            Bill bill = new Bill(90.00m, 0m, TipMode.None, 0m);
+
+            List<Attendee> attendees = new List<Attendee> 
+            {
+                new Attendee("Fabio", 1, true)
+            };
+
+            List<Share> shares = new List<Share>
+            {
+                new Share("Fabio", 90.00m)
+            };
+
+            // Act
+            string receipt = formatter.Format(bill, attendees, shares);
+
+            // Assert
+            StringAssert.Contains(receipt, "Fabio Bustamante Romillo");
+            StringAssert.Contains(receipt, DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+    }
+
+    [TestClass]
+    public sealed class FutureFeatureTests
+    {
+        // TDD-26 Placeholder failing test for future CSV receipt format (F5)
+        [TestMethod]
+        public void Format_CsvReceiptExporter_MatchesSchema()
+        {
+            Assert.Fail("PENDING: CSV receipt exporter will be implemented in a future assignment.");
+        }
+
+        // TDD-27 Placeholder failing test for future Stripe gateway (F6)
+        [TestMethod]
+        public void CalculateShares_PaymentRequest_ValidatesStripeMock()
+        {
+            Assert.Fail("PENDING: Stripe payment integration will be implemented in a future assignment.");
         }
     }
 }
