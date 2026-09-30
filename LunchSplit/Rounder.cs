@@ -9,44 +9,21 @@ namespace LunchSplit
 {
     public class Rounder
     {
-        public List <Share> RoundShares(List<Share> rawShares, RoundingMode mode)
+        public List<Share> RoundShares(List<Share> rawShares, RoundingMode mode)
         {
             List<Share> roundedShares = new List<Share>();
 
             decimal rawTotal = 0.00m;
             decimal roundedTotal = 0.00m;
 
-            for (int i = 0; i < rawShares.Count; i++)
+            foreach (Share share in rawShares)
             {
-                decimal roundedAmount;
-                rawTotal += rawShares[i].Amount;
+                rawTotal += share.Amount;
 
-                switch (mode)
-                {
-                    case RoundingMode.None:
-                        roundedAmount = rawShares[i].Amount;
-                        break;
-
-                    case RoundingMode.Bankers:
-                        roundedAmount = Math.Round(rawShares[i].Amount, 2, MidpointRounding.ToEven);
-                        break;
-
-                    case RoundingMode.Ceil:
-                        roundedAmount = Math.Ceiling(rawShares[i].Amount * 100) / 100;
-                        break;
-
-                    case RoundingMode.Floor:
-                        roundedAmount = Math.Floor(rawShares[i].Amount * 100) / 100;
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(mode));
-                }
-
+                decimal roundedAmount = RoundAmount(share.Amount, mode);
                 roundedTotal += roundedAmount;
-                Share roundedShare = new Share(rawShares[i].Name, roundedAmount);
 
-                roundedShares.Add(roundedShare);
+                roundedShares.Add(new Share(share.Name, roundedAmount));
             }
 
             // Penny reconciliation
@@ -61,7 +38,7 @@ namespace LunchSplit
 
             int index = 0;
 
-            while (difference != 0 && roundedShares.Count > 0)
+            while (difference != 0)
             {
                 decimal adjustment;
 
@@ -87,7 +64,29 @@ namespace LunchSplit
                     index = 0;
                 }
             }
+
             return roundedShares;
+        }
+
+        private decimal RoundAmount(decimal amount, RoundingMode mode)
+        {
+            switch (mode)
+            {
+                case RoundingMode.None:
+                    return amount;
+
+                case RoundingMode.Bankers:
+                    return Math.Round(amount, 2, MidpointRounding.ToEven);
+
+                case RoundingMode.Ceil:
+                    return Math.Ceiling(amount * 100) / 100;
+
+                case RoundingMode.Floor:
+                    return Math.Floor(amount * 100) / 100;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode));
+            }
         }
     }
 }
