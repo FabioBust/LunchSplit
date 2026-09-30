@@ -4,9 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using LunchSplit;
-using static LunchSplit.TipMode;
 
 namespace LunchSplit
 {   
@@ -14,7 +11,19 @@ namespace LunchSplit
     {
         public decimal ComputeTip(decimal subtotal, TipMode mode, decimal tipInput)
         {
+
+            if (subtotal < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(subtotal));
+            }
+
+            if (mode == TipMode.Fixed && tipInput < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tipInput));
+            }
+
             decimal tip;
+
             switch (mode)
             {
                 case TipMode.None:
@@ -77,7 +86,6 @@ namespace LunchSplit
             }
 
             Rounder rounder = new Rounder();
-
             return rounder.RoundShares(shares, mode);
         }
     }

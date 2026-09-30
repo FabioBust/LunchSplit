@@ -4,10 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using LunchSplit;
-using static LunchSplit.RoundingMode;
-using static LunchSplit.Share;
 
 namespace LunchSplit
 {
@@ -16,9 +12,14 @@ namespace LunchSplit
         public List <Share> RoundShares(List<Share> rawShares, RoundingMode mode)
         {
             List<Share> roundedShares = new List<Share>();
+
+            decimal rawTotal = 0.00m;
+            decimal roundedTotal = 0.00m;
+
             for (int i = 0; i < rawShares.Count; i++)
             {
                 decimal roundedAmount;
+                rawTotal += rawShares[i].Amount;
 
                 switch (mode)
                 {
@@ -42,9 +43,49 @@ namespace LunchSplit
                         throw new ArgumentOutOfRangeException(nameof(mode));
                 }
 
+                roundedTotal += roundedAmount;
                 Share roundedShare = new Share(rawShares[i].Name, roundedAmount);
 
                 roundedShares.Add(roundedShare);
+            }
+
+            // Penny reconciliation
+            if (roundedShares.Count <= 1)
+            {
+                return roundedShares;
+            }
+
+            decimal targetTotal = Math.Round(rawTotal, 2, MidpointRounding.ToEven);
+
+            decimal difference = targetTotal - roundedTotal;
+
+            int index = 0;
+
+            while (difference != 0 && roundedShares.Count > 0)
+            {
+                decimal adjustment;
+
+                if (difference > 0)
+                {
+                    adjustment = 0.01m;
+                }
+                else
+                {
+                    adjustment = -0.01m;
+                }
+
+                decimal newAmount = roundedShares[index].Amount + adjustment;
+
+                roundedShares[index] = new Share(roundedShares[index].Name, newAmount);
+
+                difference -= adjustment;
+
+                index++;
+
+                if (index == roundedShares.Count)
+                {
+                    index = 0;
+                }
             }
             return roundedShares;
         }

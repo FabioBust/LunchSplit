@@ -14,7 +14,7 @@ namespace LunchSplit
         public int Weight { get; }
         public bool Included { get; }
 
-        Attendee(string name, int weight, bool included)
+        public Attendee(string name, int weight, bool included)
         {
             Name = name;
             Weight = weight;

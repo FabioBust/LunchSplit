@@ -69,7 +69,7 @@ namespace LunchSplit.Tests
             decimal tipInput = 0m;
 
             // Act and Assert
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => splitter.ComputeTip(subtotal, mode, tipInput));
+            Assert.Throws<ArgumentOutOfRangeException>(() => splitter.ComputeTip(subtotal, mode, tipInput));
 
         }
 
@@ -84,7 +84,7 @@ namespace LunchSplit.Tests
             decimal tipInput = -1.0m;
 
             // Act and Assert
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => splitter.ComputeTip(subtotal, mode, tipInput));
+            Assert.Throws<ArgumentOutOfRangeException>(() => splitter.ComputeTip(subtotal, mode, tipInput));
         }
     }
 
@@ -528,7 +528,7 @@ namespace LunchSplit.Tests
             RoundingMode rMode = RoundingMode.Bankers;
 
             // Act and Assert
-            Assert.ThrowsException<InvalidOperationException>(() => splitter.CalculateShares(bill, attendees, rMode));
+            Assert.Throws<InvalidOperationException>(() => splitter.CalculateShares(bill, attendees, rMode));
         }
 
         // M4-23 All weights set to 0 throws division-by-zero prevention exception
@@ -555,7 +555,7 @@ namespace LunchSplit.Tests
             RoundingMode rMode = RoundingMode.Bankers;
 
             // Act and Assert
-            Assert.ThrowsException<DivideByZeroException>(() => splitter.CalculateShares(bill, attendees, rMode));
+            Assert.Throws<DivideByZeroException>(() => splitter.CalculateShares(bill, attendees, rMode));
         }
     }
 
