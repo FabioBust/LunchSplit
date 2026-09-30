@@ -15,24 +15,36 @@ namespace LunchSplit
     {
         public List <Share> RoundShares(List<Share> rawShares, RoundingMode mode)
         {
-            List<Share> roundedShares;
-            for (int i = 0; i <= rawShares.Count; i++)
+            List<Share> roundedShares = new List<Share>();
+            for (int i = 0; i < rawShares.Count; i++)
             {
+                decimal roundedAmount;
+
                 switch (mode)
                 {
                     case RoundingMode.None:
-                        roundedShares = rawShares;
+                        roundedAmount = rawShares[i].Amount;
                         break;
+
                     case RoundingMode.Bankers:
-                        roundedShares.Amount[i] = Math.Round(rawShares.Amount[i], 2, MidpointRounding.ToEven);
+                        roundedAmount = Math.Round(rawShares[i].Amount, 2, MidpointRounding.ToEven);
                         break;
+
                     case RoundingMode.Ceil:
-                        roundedShares.Amount[i] = Math.Ceiling(rawShares.Amount[i] * 100) / 100;
+                        roundedAmount = Math.Ceiling(rawShares[i].Amount * 100) / 100;
                         break;
+
                     case RoundingMode.Floor:
-                        roundedShares.Amount[i] = Math.Floor(rawShares.Amount[i] * 100) / 100;
+                        roundedAmount = Math.Floor(rawShares[i].Amount * 100) / 100;
                         break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(mode));
                 }
+
+                Share roundedShare = new Share(rawShares[i].Name, roundedAmount);
+
+                roundedShares.Add(roundedShare);
             }
             return roundedShares;
         }

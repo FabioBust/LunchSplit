@@ -20,21 +20,65 @@ namespace LunchSplit
                 case TipMode.None:
                     tip = 0.00m;
                     break;
+
                 case TipMode.Percent:
                     tip = subtotal * (tipInput / 100);
                     break;
+
                 case TipMode.Fixed:
                     tip = tipInput;
-                    break;  
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode));
             }   
             return tip;
         }
 
-        List <Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode mode)
+        public List <Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode mode)
         {
-            decimal total = bill.Subtotal + bill.Tax + bill.TipInput;
+            decimal tip = ComputeTip(bill.Subtotal, bill.Mode, bill.TipInput);
+            decimal total = bill.Subtotal + bill.Tax + tip;
 
-            return shares;
+            int totalWeight = 0;
+            int includedCount = 0;
+
+            foreach (Attendee attendee in attendees)
+            {
+                if (attendee.Included)
+                {
+                    includedCount++;
+                    totalWeight += attendee.Weight;
+                }
+            }
+
+            if (includedCount == 0)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (totalWeight == 0)
+            {
+                throw new DivideByZeroException();
+            }
+
+            List<Share> shares = new List<Share>();
+
+            foreach (Attendee attendee in attendees)
+            {
+                decimal amount = 0.00m;
+
+                if (attendee.Included)
+                {
+                    amount = total * attendee.Weight / totalWeight;
+                }
+
+                shares.Add(new Share(attendee.Name, amount));
+            }
+
+            Rounder rounder = new Rounder();
+
+            return rounder.RoundShares(shares, mode);
         }
     }
 }
