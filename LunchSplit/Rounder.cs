@@ -2,9 +2,6 @@
  * RoundingMode mode) -> List<Share>. Must implement the Penny Reconciliation 
  * algorithm.*/
 
-using System;
-using System.Collections.Generic;
-
 namespace LunchSplit
 {
     public class Rounder
@@ -16,6 +13,7 @@ namespace LunchSplit
             decimal rawTotal = 0.00m;
             decimal roundedTotal = 0.00m;
 
+            // Round each individual share
             foreach (Share share in rawShares)
             {
                 rawTotal += share.Amount;
@@ -26,7 +24,7 @@ namespace LunchSplit
                 roundedShares.Add(new Share(share.Name, roundedAmount));
             }
 
-            // Penny reconciliation
+            // Penny reconciliation is only needed when splitting between multiple people
             if (roundedShares.Count <= 1)
             {
                 return roundedShares;
@@ -38,6 +36,7 @@ namespace LunchSplit
 
             int index = 0;
 
+            // Adjust shares by one cent until the rounded total matches
             while (difference != 0)
             {
                 decimal adjustment;
@@ -68,6 +67,7 @@ namespace LunchSplit
             return roundedShares;
         }
 
+        // Apply the selected rounding rule
         private decimal RoundAmount(decimal amount, RoundingMode mode)
         {
             switch (mode)

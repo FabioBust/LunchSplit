@@ -2,10 +2,6 @@
  * decimal Subtotal, decimal Tax, TipMode (None, Percent, or Fixed), and 
  * decimal TipInput.*/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace LunchSplit
 {
     public class Bill

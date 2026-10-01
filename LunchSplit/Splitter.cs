@@ -2,16 +2,14 @@
  * TipMode mode, decimal tipInput) -> decimal tip and CalculateShares(Bill bill, 
  * List<Attendee> attendees, RoundingMode roundingMode) -> List<Share>.*/
 
-using System;
-using System.Collections.Generic;
-
 namespace LunchSplit
-{   
+{
     public class Splitter
     {
         public decimal ComputeTip(decimal subtotal, TipMode mode, decimal tipInput)
         {
 
+            // Validate values that cannot be negative
             if (subtotal < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(subtotal));
@@ -24,6 +22,7 @@ namespace LunchSplit
 
             decimal tip;
 
+            // Calculate the tip based on the selected mode
             switch (mode)
             {
                 case TipMode.None:
@@ -40,11 +39,11 @@ namespace LunchSplit
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode));
-            }   
+            }
             return tip;
         }
 
-        public List <Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode mode)
+        public List<Share> CalculateShares(Bill bill, List<Attendee> attendees, RoundingMode mode)
         {
             decimal tip = ComputeTip(bill.Subtotal, bill.Mode, bill.TipInput);
             decimal total = bill.Subtotal + bill.Tax + tip;
@@ -52,6 +51,7 @@ namespace LunchSplit
             int totalWeight = 0;
             int includedCount = 0;
 
+            // Calculate the total weight of included attendees
             foreach (Attendee attendee in attendees)
             {
                 if (attendee.Included)
@@ -73,6 +73,7 @@ namespace LunchSplit
 
             List<Share> shares = new List<Share>();
 
+            // Divide the bill according to each attendee's weight
             foreach (Attendee attendee in attendees)
             {
                 decimal amount = 0.00m;

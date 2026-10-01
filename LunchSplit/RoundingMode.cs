@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LunchSplit
+﻿namespace LunchSplit
 {
     public enum RoundingMode
     {

@@ -2,8 +2,6 @@
  * List<Attendee> attendees, List<Share> roundedShares) -> string. The output 
  * string must include your student name, current date, and creation timestamp.*/
 
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace LunchSplit
@@ -15,8 +13,10 @@ namespace LunchSplit
             List<Attendee> attendees,
             List<Share> shares)
         {
+            // Build the receipt one line at a time
             StringBuilder receipt = new StringBuilder();
 
+            // Receipt information
             receipt.AppendLine("LunchSplit Receipt");
             receipt.AppendLine("Student: Fabio Bustamante Romillo");
             receipt.AppendLine("Date: " + DateTime.Now.ToString("yyyy-MM-dd"));
@@ -29,6 +29,7 @@ namespace LunchSplit
 
             receipt.AppendLine("Shares:");
 
+            // Add each attendee's final share to the receipt
             foreach (Share share in shares)
             {
                 receipt.AppendLine(
