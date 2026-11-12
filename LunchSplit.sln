@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.10.12210.168 stable
+VisualStudioVersion = 18.10.12210.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunchSplit", "LunchSplit\LunchSplit.csproj", "{76D94477-E126-4957-A19C-1A26E7F84768}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunchSplit.Tests", "LunchSplit.Tests\LunchSplit.Tests.csproj", "{3FECFD65-7E87-451B-8BED-0487A9B352F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunchSplit.Infrastructure", "LunchSplit.Infrastructure\LunchSplit.Infrastructure.csproj", "{CFA026EA-6A62-460D-A832-2C78F700A1ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3FECFD65-7E87-451B-8BED-0487A9B352F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FECFD65-7E87-451B-8BED-0487A9B352F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FECFD65-7E87-451B-8BED-0487A9B352F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFA026EA-6A62-460D-A832-2C78F700A1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFA026EA-6A62-460D-A832-2C78F700A1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFA026EA-6A62-460D-A832-2C78F700A1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFA026EA-6A62-460D-A832-2C78F700A1ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
