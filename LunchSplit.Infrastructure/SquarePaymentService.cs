@@ -56,23 +56,46 @@ namespace LunchSplit.Infrastructure
                 Autocomplete = true
             };
 
-            // Send the request to Square Sandbox.
-            var response = await _client.Payments.CreateAsync(
-                squareRequest,
-                new RequestOptions
-                {
-                    Timeout = TimeSpan.FromSeconds(5),
-                    MaxRetries = 0
-                });
-
-            // Convert Square's response into our PaymentResult.
-            return new PaymentResult
+            try
             {
-                IsSuccess = response.Payment?.Status?.ToString()
-                    == "COMPLETED",
-                TransactionId = response.Payment?.Id,
-                HttpStatusCode = 200
-            };
+                // Send the payment to Square Sandbox.
+                var response = await _client.Payments.CreateAsync(
+                    squareRequest,
+                    new RequestOptions
+                    {
+                        Timeout = TimeSpan.FromSeconds(5),
+                        MaxRetries = 0
+                    });
+
+                // Return successful payment information.
+                return new PaymentResult
+                {
+                    IsSuccess = response.Payment?.Status?.ToString()
+                        == "COMPLETED",
+                    TransactionId = response.Payment?.Id,
+                    HttpStatusCode = 200
+                };
+            }
+            catch (SquareApiException ex)
+            {
+                // Get the error code returned by Square.
+                string errorCode = ex.Errors.FirstOrDefault()?.Code.ToString()
+                    ?? "SQUARE_ERROR";
+
+                // Convert Square's generic decline into our application's error code.
+                if (errorCode == "GENERIC_DECLINE")
+                {
+                    errorCode = "CARD_DECLINED";
+                }
+
+                // Return the error information.
+                return new PaymentResult
+                {
+                    IsSuccess = false,
+                    ErrorCode = errorCode,
+                    HttpStatusCode = (int)ex.StatusCode
+                };
+            }
         }
     }
 }
