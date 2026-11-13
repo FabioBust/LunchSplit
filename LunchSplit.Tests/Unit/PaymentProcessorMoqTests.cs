@@ -53,5 +53,30 @@ namespace LunchSplit.Tests
             // Assert
             mock.Verify(p => p.ProcessPaymentAsync(It.Is<PaymentRequest>(r => r.Amount == 25.00m)), Times.Once());
         }
+
+
+        // M3-05: Verify that a zero-dollar payment never calls the payment processor.
+        [TestMethod]
+        public async Task ProcessPaymentAsync_ZeroAmount_NeverCallsProcessor()
+        {
+            // Arrange
+            PaymentRequest request = new PaymentRequest();
+            request.Amount = 0.00m;
+
+            Mock<IPaymentProcessor> mock = new Mock<IPaymentProcessor>();
+
+            PaymentManager manager = new PaymentManager(mock.Object);
+
+            // Act
+            PaymentResult result = await manager.ProcessPaymentAsync(request);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+
+            mock.Verify(
+                p => p.ProcessPaymentAsync(It.IsAny<PaymentRequest>()),
+                Times.Never());
+        }
+
     }
 }
