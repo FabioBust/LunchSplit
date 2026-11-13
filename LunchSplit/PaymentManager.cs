@@ -1,4 +1,6 @@
 ﻿
+using System.Net.Http;
+
 namespace LunchSplit
 {
     public class PaymentManager
@@ -24,8 +26,17 @@ namespace LunchSplit
                 };
             }
 
-            // Delegate the payment to the processor.
-            return await _paymentProcessor.ProcessPaymentAsync(request);
+            try
+            {
+                // Delegate the payment to the processor.
+                return await _paymentProcessor.ProcessPaymentAsync(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                // Convert network failures into a payment gateway exception.
+                throw new PaymentGatewayTimeoutException(
+                    "The payment gateway could not be reached.", ex);
+            }
         }
     }
 }
